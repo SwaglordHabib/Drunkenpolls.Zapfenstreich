@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-Drunkenpolls.Zapfenstreich-5570EFC9-6FB2-4339-977D-7B6E1686633D</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coravel" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.4" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.1" />
+  </ItemGroup>
+</Project>
