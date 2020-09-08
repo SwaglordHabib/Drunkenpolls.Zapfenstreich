@@ -46,7 +46,7 @@ namespace Drunkenpolls.Zapfenstreich
             IMongoCollection<Game> collection = database.GetCollection<Game>(appSettings.mongodbCollection);
 
             var gameToRemove = collection.Find(Builders<Game>.Filter.Empty).ToList();
-            gameToRemove = gameToRemove.FindAll(x => DateTime.Parse(x.Creation).AddHours(1) < DateTime.Now);
+            gameToRemove = gameToRemove.FindAll(x => x.Creation != null ? DateTime.Parse(x.Creation).AddHours(1) < DateTime.Now : true);
 
             foreach (var item in gameToRemove)
             {
