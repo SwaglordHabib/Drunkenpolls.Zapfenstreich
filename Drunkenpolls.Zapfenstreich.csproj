@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.4" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Drunkenpolls.MangoMaracuja\Drunkenpolls.MangoMaracuja.csproj" />
+  </ItemGroup>
 </Project>

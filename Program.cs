@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coravel;
+using Drunkenpolls.MangoMaracuja;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,7 +36,7 @@ namespace Drunkenpolls.Zapfenstreich
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
+                    services.Configure<IDrunkenpollsDatabaseSettings>(hostContext.Configuration.GetSection("DrunkenpollsDatabaseSettings"));
                     services.AddScheduler();
                     services.AddTransient<Zapfenstreich>();
                 });

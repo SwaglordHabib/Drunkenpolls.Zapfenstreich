@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Coravel.Invocable;
+using Drunkenpolls.MangoMaracuja;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -29,11 +30,11 @@ namespace Drunkenpolls.Zapfenstreich
 
     public class Zapfenstreich : IInvocable
     {
-        private readonly AppSettings appSettings;
+        private readonly IDrunkenpollsDatabaseSettings _databaseSettings;
 
-        public Zapfenstreich(IOptions<AppSettings> _appSettings)
+        public Zapfenstreich(IOptions<DrunkenpollsDatabaseSettings> databaseSettings)
         {
-            appSettings = _appSettings.Value;
+            _databaseSettings = databaseSettings.Value;
         }
 
 
@@ -41,9 +42,9 @@ namespace Drunkenpolls.Zapfenstreich
         {
             Console.WriteLine("Zapfenstreich Invoked.");
 
-            var client = new MongoClient(appSettings.ConnectionString);
-            var database = client.GetDatabase(appSettings.mongodbDatabase);
-            IMongoCollection<Game> collection = database.GetCollection<Game>(appSettings.mongodbCollection);
+            var client = new MongoClient(_databaseSettings.ConnectionString);
+            var database = client.GetDatabase(_databaseSettings.DatabaseName);
+            IMongoCollection<Game> collection = database.GetCollection<Game>(_databaseSettings.DrunkenpollsCollectionName);
 
             var gameToRemove = collection.Find(Builders<Game>.Filter.Empty).ToList();
             gameToRemove = gameToRemove.FindAll(x => x.Creation != null ? DateTime.Parse(x.Creation).AddHours(1) < DateTime.Now : true);
