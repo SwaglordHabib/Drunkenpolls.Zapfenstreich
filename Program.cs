@@ -1,7 +1,11 @@
+using System.IO;
 using Coravel;
 using Drunkenpolls.Bar;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Zapfenstreich.Services;
 
 namespace Drunkenpolls.Zapfenstreich
 {
@@ -9,6 +13,7 @@ namespace Drunkenpolls.Zapfenstreich
     {
         public static void Main(string[] args)
         {
+
             IHost host = CreateHostBuilder(args).Build();
             host.Services.UseScheduler(scheduler =>
             {
@@ -22,9 +27,17 @@ namespace Drunkenpolls.Zapfenstreich
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.Configure<IDrunkenpollsDatabaseSettings>(hostContext.Configuration.GetSection("DrunkenpollsDatabaseSettings"));
+                    var Config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+
+                    services.Configure<DrunkenpollsDatabaseSettings>(Config.GetSection(nameof(DrunkenpollsDatabaseSettings)));
+
+                    services.AddSingleton<IDrunkenpollsDatabaseSettings>(sp => sp.GetRequiredService<IOptions<DrunkenpollsDatabaseSettings>>().Value);
+
+                    services.AddSingleton<GameService>();
+
                     services.AddScheduler();
                     services.AddTransient<Zapfenstreich>();
                 });
     }
+
 }

@@ -1,42 +1,37 @@
 using System;
 using System.Threading.Tasks;
 using Coravel.Invocable;
-using Drunkenpolls.Bar;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+using Zapfenstreich.Services;
 
 namespace Drunkenpolls.Zapfenstreich
 {
     public class Zapfenstreich : IInvocable
     {
-        private readonly IDrunkenpollsDatabaseSettings _databaseSettings;
+        private readonly GameService _dbService;
 
-        public Zapfenstreich(IOptions<DrunkenpollsDatabaseSettings> databaseSettings)
+        public Zapfenstreich(GameService dbService)
         {
-            _databaseSettings = databaseSettings.Value;
-        }
+            _dbService = dbService;
 
+        }
 
         public Task Invoke()
         {
             Console.WriteLine("Zapfenstreich Invoked.");
-
-            var client = new MongoClient(_databaseSettings.ConnectionString);
-            var database = client.GetDatabase(_databaseSettings.DatabaseName);
-            IMongoCollection<Game> collection = database.GetCollection<Game>(_databaseSettings.DrunkenpollsCollectionName);
-
-            var gameToRemove = collection.Find(Builders<Game>.Filter.Empty).ToList();
-            gameToRemove = gameToRemove.FindAll(x => x.Creation == null
-                                                     || DateTime.Parse(x.Creation).AddHours(1) < DateTime.Now);
-
-            foreach (var item in gameToRemove)
+            try
             {
-                collection.DeleteOne(Builders<Game>.Filter.Eq(x => x.Id, item.Id));
+                _dbService.GetAllInactive().ForEach(item =>{
+                    _dbService.Remove(item.Id);
+                });
+
+                return Task.CompletedTask;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+                throw new Exception(exception.Message);
             }
 
-            Console.WriteLine(string.Format("{0} items have been removed.", gameToRemove.Count));
-
-            return Task.CompletedTask;
         }
     }
 
